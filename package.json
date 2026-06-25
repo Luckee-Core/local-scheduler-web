@@ -1,11 +1,11 @@
 {
-  "name": "nextjs-template",
+  "name": "local-scheduler-web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 4121",
     "build": "next build",
-    "start": "next start",
+    "start": "next start --port 4121",
     "lint": "eslint ."
   },
   "dependencies": {

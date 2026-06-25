@@ -1,33 +1,36 @@
-# Next.js Template
+# Local Scheduler Web
 
-Bare Next.js app with **src/app**, **src/store**, and **src/utils**. Redux and Tailwind are wired; no entity/dashboard/API code.
+Dashboard UI for **local-scheduler-express-server**. View scheduled tasks, toggle enable flags, run tasks manually, and browse run history.
 
-## Run
+Default port: **4121**.
+
+## Quick start
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:4121](http://localhost:4121).
 
-## Architecture & agent rules
+Ensure the express server is running on `http://127.0.0.1:4120`.
 
-Follow **`.cursor/rules/AGENTS.md`** and **`.cursor/architecture/`**.
+## Routes
 
-| Rule | Summary |
-|------|---------|
-| Redux | **Zero selector functions** — `useAppSelector((s) => s.slice)` only; derive with `useMemo` |
-| Routes | **No `[id]`** — use static `/entity-detail-page` + `current*` in Redux |
-| Utils | **Generic** helpers (`date/`, `string/`) — not table-specific formatters |
+| Path | Page |
+|------|------|
+| `/` | Scheduled tasks table |
+| `/runs` | Run history |
 
-## Layout
+## Architecture
 
-- **src/app** — routes and layout
-- **src/store** — Redux (store, reducer, one minimal slice)
-- **src/utils** — shared utilities
-- **src/components** — shared UI (e.g. ReduxProvider)
+Follow **`.cursor/rules/AGENTS.md`** and **`.cursor/architecture/`** (ADRs 001–011).
 
-## As GitHub template
+- Dashboard chrome: `AppLayout`, sidebar, breadcrumbs (ADR 009)
+- Feature UI: `src/packages/ptasks/` (ADR 011)
+- Redux: `dumps/tasks`, `dumps/runs`, manual thunks only
 
-Repo → Settings → General → check **Template repository**. Then use as `GITHUB_TEMPLATE_WEB` when creating new web repos from the panel.
+## Related
+
+- **local-scheduler-express-server** — scheduler API + cron engine

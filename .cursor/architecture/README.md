@@ -22,7 +22,9 @@ ADRs keep implementation consistent by documenting:
 6. [006 – Constants and utilities](./006-constants-utilities.md) — Generic formatters only (not table-specific).
 7. [007 – Starter template layout](./007-starter-template-layout.md) — Minimal shipped store and folder growth path.
 8. [008 – Detail page routing](./008-detail-page-routing.md) — `{entity}-detail-page`, no `[id]` routes.
+9. [009 – Dashboard breadcrumbs and sidebar](./009-redux-dashboard-breadcrumbs-and-sidebar.md) — `AppLayout`, sidebar, nav fallback.
 10. [010 – Public content reads from Express](./010-public-blog-express-fetch.md) — Server Component reads + Redux list hydration.
+11. [011 – Scheduler dashboard UI](./011-scheduler-dashboard-ui.md) — `packages/ptasks/` table/row composition.
 
 ## How to use
 

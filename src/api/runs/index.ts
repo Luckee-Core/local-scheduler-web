@@ -1,0 +1,1 @@
+export { getAllRuns } from './getAllRuns';

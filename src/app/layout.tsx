@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js App",
-  description: "Next.js template with Redux and Tailwind",
+  title: "Local Scheduler",
+  description: "Local-only task scheduler studio for worker Express APIs",
 };
 
 export default function RootLayout({
