@@ -7,7 +7,7 @@ type PatchTaskBody = {
 };
 
 /**
- * PATCH /api/tasks/:id — update task overrides.
+ * PATCH /api/tasks/:id — update task (e.g. enabled).
  */
 export const patchTask = (taskId: string, body: PatchTaskBody) =>
   requestApi<ScheduledTask>(`${API_BASE_URL}/api/tasks/${encodeURIComponent(taskId)}`, {

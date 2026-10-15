@@ -7,8 +7,10 @@ import { useAppDispatch, useAppSelector } from '@/store';
 import { BreadcrumbBuilderActions } from '@/store/builders/breadcrumbBuilder';
 import { getAllRunsThunk, getAllTasksThunk } from '@/store/thunks';
 import { TaskDetailOverview } from './overview';
+import { TaskDetailEditForm } from './edit-form';
 import { TaskDetailActions } from './actions';
 import { TaskDetailRunHistory } from './run-history';
+import { TaskDetailBuilderActions } from '@/store/builders/taskDetailBuilder';
 
 /**
  * Task detail workspace — reads `currentTask` (ADR 008).
@@ -22,6 +24,10 @@ export const TaskDetailPage = () => {
     void dispatch(getAllTasksThunk());
     void dispatch(getAllRunsThunk(200));
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(TaskDetailBuilderActions.resetSaveState());
+  }, [currentTask.id, dispatch]);
 
   useEffect(() => {
     if (!currentTask.id) {
@@ -55,6 +61,7 @@ export const TaskDetailPage = () => {
     <div className={styles.page}>
       <TaskDetailActions />
       <TaskDetailOverview />
+      <TaskDetailEditForm />
       <TaskDetailRunHistory />
     </div>
   );

@@ -2,7 +2,7 @@
 
 BEFORE implementing ANY feature, you MUST:
 1. Read `.cursor/architecture/README.md`.
-2. Read the relevant ADRs (**001–008**, **010**).
+2. Read the relevant ADRs (**001–013**, **015**).
 3. Follow documented patterns EXACTLY; if no pattern exists, add an ADR first.
 
 ## Redux — zero selector functions

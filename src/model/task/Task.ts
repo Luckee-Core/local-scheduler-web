@@ -24,7 +24,6 @@ export type ScheduledTask = {
   };
   schedule: TaskSchedule;
   lifecycle: 'start_if_needed_stop_if_started';
-  enabledByDefault: boolean;
   enabled: boolean;
   expressDir: string | null;
   port: number;

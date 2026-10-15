@@ -3,7 +3,7 @@ import type { TaskSchedule } from '@/model';
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 /**
- * Formats a task schedule for display in the dashboard table.
+ * Formats a task schedule for display on the dashboard.
  */
 export const formatTaskSchedule = (schedule: TaskSchedule): string => {
   const weekdays =

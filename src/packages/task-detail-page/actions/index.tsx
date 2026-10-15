@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { useCallback } from 'react';
 import { TASKS_PATH } from '@/config/routes';
 import { useAppDispatch, useAppSelector } from '@/store';
-import { patchTaskEnabledThunk, runTaskNowThunk } from '@/store/thunks';
+import { useRouter } from 'next/navigation';
+import { patchTaskEnabledThunk, runTaskNowThunk, deleteTaskThunk } from '@/store/thunks';
 
 export const TaskDetailActions = () => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const currentTask = useAppSelector((state) => state.currentTask);
   const tasks = useAppSelector((state) => state.tasks);
@@ -25,6 +27,16 @@ export const TaskDetailActions = () => {
   const handleRunNow = useCallback(() => {
     void dispatch(runTaskNowThunk(task.id));
   }, [dispatch, task.id]);
+
+  const handleDelete = useCallback(async () => {
+    if (!window.confirm(`Delete task "${task.name}"?`)) {
+      return;
+    }
+    const status = await dispatch(deleteTaskThunk(task.id));
+    if (status === 200) {
+      router.push(TASKS_PATH);
+    }
+  }, [dispatch, router, task.id, task.name]);
 
   return (
     <section className={styles.section}>
@@ -49,6 +61,9 @@ export const TaskDetailActions = () => {
             className={styles.runButton(isRunning)}
           >
             {isRunning ? 'Running…' : 'Run now'}
+          </button>
+          <button type="button" onClick={() => void handleDelete()} className={styles.deleteButton}>
+            Delete
           </button>
         </div>
       </div>
@@ -81,4 +96,7 @@ const styles = {
         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
         : 'bg-orange-500 text-white hover:bg-orange-600 cursor-pointer'
     }`,
+  deleteButton: `
+    rounded-md border border-red-200 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 cursor-pointer
+  `,
 };

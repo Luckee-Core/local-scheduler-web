@@ -19,6 +19,9 @@ export const tasksSlice = createSlice({
     upsertTask: (state, action: PayloadAction<ScheduledTask>) => {
       state[action.payload.id] = action.payload;
     },
+    removeTask: (state, action: PayloadAction<string>) => {
+      delete state[action.payload];
+    },
   },
 });
 

@@ -24,7 +24,6 @@ export const EMPTY_SCHEDULED_TASK: ScheduledTask = {
     hourEnd: 17,
   },
   lifecycle: 'start_if_needed_stop_if_started',
-  enabledByDefault: true,
   enabled: false,
   expressDir: null,
   port: 0,
@@ -39,6 +38,16 @@ export const currentTaskSlice = createSlice({
   initialState: EMPTY_SCHEDULED_TASK,
   reducers: {
     setCurrentTask: (_state, action: PayloadAction<ScheduledTask>) => action.payload,
+    patchCurrentTask: (state, action: PayloadAction<Partial<ScheduledTask>>) => {
+      const patch = action.payload;
+      return {
+        ...state,
+        ...patch,
+        worker: patch.worker ? { ...state.worker, ...patch.worker } : state.worker,
+        request: patch.request ? { ...state.request, ...patch.request } : state.request,
+        schedule: patch.schedule ? { ...state.schedule, ...patch.schedule } : state.schedule,
+      };
+    },
     reset: () => EMPTY_SCHEDULED_TASK,
   },
 });

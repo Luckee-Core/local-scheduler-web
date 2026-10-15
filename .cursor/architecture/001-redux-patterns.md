@@ -43,15 +43,22 @@ export const refreshJobs = createAsyncThunk("jobs/refresh", async () => {
 ### 2) Every thunk must use this signature: `AppThunk<Promise<200 | 400 | 500>>`
 Thunk return values are status-code unions. This keeps dispatch call sites explicit and consistent.
 
+**Form save thunks take no arguments.** They read the editing entity from `getState().current*` and map it to the API. Persist `saveError` / `saveStatus` on the matching **builder** (primitives only). See [012 – Package form inputs](./012-package-form-inputs.md).
+
 ✅ **Do**
 ```ts
 import type { AppThunk } from "@/store";
 
-export const updateJobThunk =
-  (input: { id: string; status: JobStatus }): AppThunk<Promise<200 | 400 | 500>> =>
-  async (dispatch) => {
-    const result = await updateJobApi(input);
+export const saveJobThunk =
+  (): AppThunk<Promise<200 | 400 | 500>> =>
+  async (dispatch, getState) => {
+    const current = getState().currentJob;
+    const result =
+      current.id === ""
+        ? await createJobApi({ title: current.title })
+        : await updateJobApi(current.id, { title: current.title });
     if (!result.success || !result.data) {
+      dispatch(JobsBuilderActions.setSaveError(result.error?.message ?? "Save failed"));
       return result.httpStatus === 400 ? 400 : 500;
     }
     dispatch(JobsActions.upsertJob(result.data));
@@ -64,7 +71,12 @@ export const updateJobThunk =
 export const updateJob = () => async () => {
   return true; // ambiguous return contract
 };
+
+// Form save with a payload copied from useState
+export const createJobThunk = (payload: CreateJobPayload) => ...
 ```
+
+**Exception:** creating a *related* row from a **builder string** already in Redux is allowed. Do not pass the whole form as a payload object.
 
 ---
 

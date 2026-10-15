@@ -20,16 +20,15 @@ src/
   store/        # Redux store, slices, thunks (no selector modules)
   config/       # route path constants (e.g. ORDER_DETAIL_PAGE_PATH)
   api/          # API clients/services and API contracts
+  model/        # persisted entity types (one file per table entity)
 ```
 
 ✅ **Do**
 ```text
 src/app/orders/page.tsx
-src/packages/orders/ui/OrdersTable.tsx
+src/packages/orders/table/index.tsx
+src/packages/orders/table/row/index.tsx
 src/components/Button.tsx
-src/utils/date/formatDate.ts
-src/store/orders/orders.slice.ts
-src/api/orders/orders.client.ts
 ```
 
 ❌ **Don't**
@@ -88,36 +87,30 @@ interface Job {
 
 ---
 
-### 4) Barrel exports are required (`index.ts` in every folder)
-Every folder in `packages/`, `components/`, `utils/`, `store/`, and `api/` must include an `index.ts` that re-exports the folder's public API.
+### 4) Package root is `index.tsx` only; optional barrels inside subfolders
+The package entry is **`index.tsx`** with `export const FeatureName`. Do **not** add a root `index.ts` barrel alongside a separate `{feature}.tsx`. Optional `index.ts` barrels are allowed **inside** subfolders only (e.g. `header/buttons/index.ts`).
 
 ✅ **Do**
 ```text
 src/packages/orders/
-  index.ts
-  OrdersPage.tsx
-  ui/
-    index.ts
-    OrdersTable.tsx
-```
-
-```ts
-// src/packages/orders/index.ts
-export { OrdersPage } from "./OrdersPage";
-export * from "./ui";
+  index.tsx              # export const Orders
+  table/
+    index.tsx
+    row/index.tsx
+  header/
+    index.tsx
+    buttons/refresh-orders/index.tsx
 ```
 
 ❌ **Don't**
 ```text
 src/packages/orders/
   OrdersPage.tsx
+  index.ts               # root barrel + separate component file
   ui/
     OrdersTable.tsx
-```
-
-```ts
-// Missing barrel forces deep imports everywhere:
-import { OrdersTable } from "@/packages/orders/ui/OrdersTable";
+  actions/
+    row-actions/index.tsx
 ```
 
 ---

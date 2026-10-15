@@ -1,4 +1,4 @@
-import { TASKS_PATH, RUNS_PATH } from '@/config/routes';
+import { TASKS_PATH, RUNS_PATH, TASK_CREATE_PAGE_PATH } from '@/config/routes';
 
 export type SidebarLink = {
   name: string;
@@ -18,6 +18,7 @@ export const getSchedulerSidebarSections = (): SidebarSection[] => [
     title: 'Scheduler',
     links: [
       { name: 'Tasks', href: TASKS_PATH },
+      { name: 'Add task', href: TASK_CREATE_PAGE_PATH },
       { name: 'Run history', href: RUNS_PATH },
     ],
   },

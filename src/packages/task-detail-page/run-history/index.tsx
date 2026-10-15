@@ -1,12 +1,19 @@
 'use client';
 
-import { useMemo } from 'react';
-import { useAppSelector } from '@/store';
+import { useCallback, useMemo } from 'react';
+import { useAppDispatch, useAppSelector } from '@/store';
+import { getAllRunsThunk } from '@/store/thunks';
 import { formatTimestamp } from '@/packages/ptasks/format-timestamp';
 
 export const TaskDetailRunHistory = () => {
+  const dispatch = useAppDispatch();
   const currentTask = useAppSelector((state) => state.currentTask);
   const runs = useAppSelector((state) => state.runs);
+  const schedulerBuilder = useAppSelector((state) => state.schedulerBuilder);
+
+  const handleRefresh = useCallback(() => {
+    void dispatch(getAllRunsThunk(200));
+  }, [dispatch]);
 
   const taskRuns = useMemo(
     () =>
@@ -18,7 +25,17 @@ export const TaskDetailRunHistory = () => {
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.title}>Run history</h2>
+      <div className={styles.header}>
+        <h2 className={styles.title}>Run history</h2>
+        <button
+          type="button"
+          onClick={handleRefresh}
+          disabled={schedulerBuilder.isLoadingRuns}
+          className={styles.refreshButton(schedulerBuilder.isLoadingRuns)}
+        >
+          {schedulerBuilder.isLoadingRuns ? 'Refreshing…' : 'Refresh'}
+        </button>
+      </div>
 
       {taskRuns.length === 0 ? (
         <p className={styles.empty}>No runs recorded for this task yet.</p>
@@ -45,7 +62,7 @@ export const TaskDetailRunHistory = () => {
                   <td className={styles.cellMuted}>{formatTimestamp(run.startedAt)}</td>
                   <td className={styles.cellMuted}>{run.durationMs}ms</td>
                   <td className={styles.cellMuted}>{run.httpStatus ?? '—'}</td>
-                  <td className={styles.cellMuted}>{run.responseSummary ?? run.error ?? '—'}</td>
+                  <td className={styles.cellSummary}>{run.responseSummary ?? run.error ?? '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -60,9 +77,18 @@ const styles = {
   section: `
     rounded-lg border border-gray-200 bg-white p-6 shadow-sm
   `,
+  header: `
+    flex flex-wrap items-center justify-between gap-4
+  `,
   title: `
     text-lg font-semibold text-gray-900
   `,
+  refreshButton: (disabled: boolean) =>
+    `rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+      disabled
+        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+        : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 cursor-pointer'
+    }`,
   empty: `
     mt-4 text-sm text-gray-600
   `,
@@ -70,7 +96,7 @@ const styles = {
     mt-4 overflow-x-auto
   `,
   table: `
-    w-full min-w-[640px] border-collapse text-left
+    w-full min-w-[800px] border-collapse text-left
   `,
   headerRow: `
     border-b border-gray-200 bg-gray-50
@@ -82,10 +108,13 @@ const styles = {
     border-b border-gray-100
   `,
   cell: `
-    px-3 py-3 text-sm text-gray-900
+    px-3 py-3 text-sm text-gray-900 whitespace-nowrap
   `,
   cellMuted: `
-    px-3 py-3 text-sm text-gray-600 max-w-xs truncate
+    px-3 py-3 text-sm text-gray-600 whitespace-nowrap
+  `,
+  cellSummary: `
+    px-3 py-3 text-xs font-mono text-gray-700 max-w-2xl whitespace-pre-wrap break-words align-top
   `,
   statusBadge: (status: string) => {
     if (status === 'failed') {

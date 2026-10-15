@@ -48,45 +48,52 @@ export const PtasksTableRow = (props: PtasksTableRowProps) => {
   );
 
   const workerLabel = task.expressDir
-    ? `${task.workerProjectId} · ${task.worker.expressRepoName}`
+    ? `${task.workerProjectId} · :${task.port}`
     : `${task.workerProjectId} (no path)`;
 
+  const endpointLabel = `${task.request.method} ${task.request.path}`;
   const statusLabel = isRunning ? 'Running…' : lastRunStatus ?? 'Idle';
 
   return (
     <tr className={styles.row} onClick={handleRowClick}>
       <td className={styles.cell}>
-        <span className={styles.nameLink}>{task.name}</span>
+        <div className={styles.linePrimary}>
+          <span className={styles.name}>{task.name}</span>
+          <span className={styles.statusBadge(isRunning, lastRunStatus)}>{statusLabel}</span>
+        </div>
+        <p className={styles.lineSecondary}>{workerLabel}</p>
+        <p className={styles.lineMono}>{endpointLabel}</p>
       </td>
-      <td className={styles.cellMuted}>{workerLabel}</td>
-      <td className={styles.cellMono}>
-        {task.request.method} {task.request.path}
-      </td>
-      <td className={styles.cellMuted}>{formatTaskSchedule(task.schedule)}</td>
       <td className={styles.cell}>
-        <label className={styles.toggleLabel} onClick={(e) => e.stopPropagation()}>
+        <p className={styles.lineSecondary}>{formatTaskSchedule(task.schedule)}</p>
+      </td>
+      <td className={styles.cell}>
+        <p className={styles.runLine}>
+          <span className={styles.runLabel}>Last</span>
+          <span>{formatTimestamp(lastRunAt)}</span>
+        </p>
+        <p className={styles.runLine}>
+          <span className={styles.runLabel}>Next</span>
+          <span>{formatTimestamp(task.nextRunAt)}</span>
+        </p>
+      </td>
+      <td className={styles.cellActions}>
+        <label className={styles.toggleLabel} onClick={(event) => event.stopPropagation()}>
           <input
             type="checkbox"
             checked={task.enabled}
             onChange={handleToggleEnabled}
             className={styles.checkbox}
           />
-          {task.enabled ? 'On' : 'Off'}
+          <span className={styles.toggleText}>{task.enabled ? 'On' : 'Off'}</span>
         </label>
-      </td>
-      <td className={styles.cellMuted}>{formatTimestamp(lastRunAt)}</td>
-      <td className={styles.cellMuted}>{formatTimestamp(task.nextRunAt)}</td>
-      <td className={styles.cell}>
-        <span className={styles.statusBadge(isRunning, lastRunStatus)}>{statusLabel}</span>
-      </td>
-      <td className={styles.cell}>
         <button
           type="button"
           onClick={handleRunNow}
           disabled={isRunning}
           className={styles.runButton(isRunning)}
         >
-          {isRunning ? 'Running…' : 'Run now'}
+          {isRunning ? '…' : 'Run'}
         </button>
       </td>
     </tr>
@@ -95,40 +102,57 @@ export const PtasksTableRow = (props: PtasksTableRowProps) => {
 
 const styles = {
   row: `
-    border-b border-gray-100 hover:bg-gray-50/80 cursor-pointer
+    border-b border-gray-100 hover:bg-gray-50/80 cursor-pointer align-top
   `,
   cell: `
-    px-3 py-3 text-sm text-gray-900 align-top
+    px-3 py-2.5 text-sm text-gray-900 align-top
   `,
-  cellMuted: `
-    px-3 py-3 text-sm text-gray-600 align-top
+  cellActions: `
+    px-3 py-2.5 align-top whitespace-nowrap
   `,
-  cellMono: `
-    px-3 py-3 text-xs font-mono text-gray-700 align-top max-w-xs truncate
+  linePrimary: `
+    flex flex-wrap items-center gap-2
   `,
-  nameLink: `
-    text-orange-600 hover:underline
+  name: `
+    font-medium text-orange-600
+  `,
+  lineSecondary: `
+    mt-0.5 text-xs leading-snug text-gray-600
+  `,
+  lineMono: `
+    mt-0.5 break-all font-mono text-xs leading-snug text-gray-500
+  `,
+  runLine: `
+    text-xs text-gray-700
+    first:mt-0
+    [&+&]:mt-1
+  `,
+  runLabel: `
+    mr-1.5 inline-block w-8 font-medium text-gray-400
   `,
   toggleLabel: `
-    inline-flex items-center gap-2 text-sm cursor-pointer
+    mb-2 flex items-center gap-1.5 text-xs cursor-pointer
+  `,
+  toggleText: `
+    text-gray-600
   `,
   checkbox: `
     rounded border-gray-300
   `,
   statusBadge: (running: boolean, lastStatus: string | null) => {
     if (running) {
-      return 'inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700';
+      return 'inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium leading-none text-blue-700';
     }
     if (lastStatus === 'failed') {
-      return 'inline-flex rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700';
+      return 'inline-flex rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium leading-none text-red-700';
     }
     if (lastStatus === 'success') {
-      return 'inline-flex rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700';
+      return 'inline-flex rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium leading-none text-green-700';
     }
-    return 'inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600';
+    return 'inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium leading-none text-gray-600';
   },
   runButton: (disabled: boolean) =>
-    `rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+    `rounded px-2.5 py-1 text-xs font-medium transition-colors ${
       disabled
         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
         : 'bg-orange-500 text-white hover:bg-orange-600 cursor-pointer'

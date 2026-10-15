@@ -14,10 +14,7 @@ import { useAppDispatch } from '@/store';
 
 const SIDEBAR_VISIBLE_KEY = 'local-scheduler-sidebar-visible';
 
-const getStoredSidebarVisible = (): boolean => {
-  if (typeof window === 'undefined') {
-    return true;
-  }
+const readStoredSidebarVisible = (): boolean => {
   try {
     const stored = localStorage.getItem(SIDEBAR_VISIBLE_KEY);
     if (stored === null) {
@@ -35,8 +32,12 @@ type AppLayoutProps = {
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const dispatch = useAppDispatch();
-  const [isSidebarVisible, setIsSidebarVisible] = useState(getStoredSidebarVisible);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const pathname = usePathname();
+
+  useLayoutEffect(() => {
+    setIsSidebarVisible(readStoredSidebarVisible());
+  }, []);
 
   useLayoutEffect(() => {
     dispatch(BreadcrumbBuilderActions.reset());

@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react';
 import { useAppSelector } from '@/store';
-import { formatTaskSchedule } from '@/packages/ptasks/format-task-schedule';
 import { formatTimestamp } from '@/packages/ptasks/format-timestamp';
 
 export const TaskDetailOverview = () => {
@@ -24,7 +23,7 @@ export const TaskDetailOverview = () => {
 
   return (
     <section className={styles.section}>
-      <h1 className={styles.title}>{task.name}</h1>
+      <h1 className={styles.title}>{currentTask.name || task.name}</h1>
       <p className={styles.subtitle}>Task ID: {task.id}</p>
 
       <dl className={styles.grid}>
@@ -37,18 +36,8 @@ export const TaskDetailOverview = () => {
           <dd className={styles.valueMono}>{task.expressDir ?? '—'}</dd>
         </div>
         <div className={styles.row}>
-          <dt className={styles.label}>Endpoint</dt>
-          <dd className={styles.valueMono}>
-            {task.request.method} {task.request.path}
-          </dd>
-        </div>
-        <div className={styles.row}>
-          <dt className={styles.label}>Schedule</dt>
-          <dd className={styles.value}>{formatTaskSchedule(task.schedule)}</dd>
-        </div>
-        <div className={styles.row}>
-          <dt className={styles.label}>Enabled</dt>
-          <dd className={styles.value}>{task.enabled ? 'Yes' : 'No'}</dd>
+          <dt className={styles.label}>Resolved port</dt>
+          <dd className={styles.value}>{task.port}</dd>
         </div>
         <div className={styles.row}>
           <dt className={styles.label}>Last run</dt>

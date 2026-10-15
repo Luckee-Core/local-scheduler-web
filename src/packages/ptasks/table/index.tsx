@@ -34,8 +34,9 @@ export const PtasksTable = () => {
   if (sortedTasks.length === 0) {
     return (
       <p className={styles.empty}>
-        No scheduled tasks found. Add entries to{' '}
-        <code className={styles.code}>data/tasks.registry.json</code> on the express server.
+        No scheduled tasks found. Use <strong>Add task</strong> in the sidebar, run{' '}
+        <code className={styles.code}>npm run db:seed</code> on the express server, or{' '}
+        <code className={styles.code}>POST /api/tasks</code> from another project.
       </p>
     );
   }
@@ -45,15 +46,10 @@ export const PtasksTable = () => {
       <table className={styles.table}>
         <thead>
           <tr className={styles.headerRow}>
-            <th className={styles.headerCell}>Name</th>
-            <th className={styles.headerCell}>Worker</th>
-            <th className={styles.headerCell}>Endpoint</th>
-            <th className={styles.headerCell}>Schedule</th>
-            <th className={styles.headerCell}>Enabled</th>
-            <th className={styles.headerCell}>Last run</th>
-            <th className={styles.headerCell}>Next run</th>
-            <th className={styles.headerCell}>Status</th>
-            <th className={styles.headerCell}>Actions</th>
+            <th className={styles.headerCellTask}>Task</th>
+            <th className={styles.headerCellSchedule}>Schedule</th>
+            <th className={styles.headerCellRuns}>Runs</th>
+            <th className={styles.headerCellActions}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -79,13 +75,22 @@ const styles = {
     overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm
   `,
   table: `
-    w-full min-w-[960px] border-collapse text-left
+    w-full table-fixed border-collapse text-left
   `,
   headerRow: `
     border-b border-gray-200 bg-gray-50
   `,
-  headerCell: `
-    px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-gray-500
+  headerCellTask: `
+    px-3 py-2 w-[38%] text-xs font-semibold uppercase tracking-wide text-gray-500
+  `,
+  headerCellSchedule: `
+    px-3 py-2 w-[32%] text-xs font-semibold uppercase tracking-wide text-gray-500
+  `,
+  headerCellRuns: `
+    px-3 py-2 w-[18%] text-xs font-semibold uppercase tracking-wide text-gray-500
+  `,
+  headerCellActions: `
+    px-3 py-2 w-[12%] text-xs font-semibold uppercase tracking-wide text-gray-500
   `,
   empty: `
     rounded-lg border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-gray-600
