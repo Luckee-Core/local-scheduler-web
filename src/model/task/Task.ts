@@ -1,4 +1,4 @@
-export type TaskSchedule = {
+export type IntervalTaskSchedule = {
   kind: 'interval';
   intervalMinutes: number;
   timezone: string;
@@ -6,6 +6,16 @@ export type TaskSchedule = {
   hourStart: number;
   hourEnd: number;
 };
+
+export type DailyTaskSchedule = {
+  kind: 'daily';
+  hour: number;
+  minute: number;
+  timezone: string;
+  weekdays: number[];
+};
+
+export type TaskSchedule = IntervalTaskSchedule | DailyTaskSchedule;
 
 export type ScheduledTask = {
   id: string;

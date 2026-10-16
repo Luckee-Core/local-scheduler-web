@@ -1,1 +1,6 @@
-export type { ScheduledTask, TaskSchedule } from './Task';
+export type {
+  DailyTaskSchedule,
+  IntervalTaskSchedule,
+  ScheduledTask,
+  TaskSchedule,
+} from './Task';

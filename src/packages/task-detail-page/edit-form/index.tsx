@@ -52,6 +52,43 @@ export const TaskDetailEditForm = () => {
     [dispatch, task.schedule],
   );
 
+  const schedule = task.schedule;
+  const isDaily = schedule.kind === 'daily';
+
+  const setScheduleKind = useCallback(
+    (kind: 'daily' | 'interval') => {
+      if (kind === 'daily' && schedule.kind !== 'daily') {
+        dispatch(
+          CurrentTaskActions.patchCurrentTask({
+            schedule: {
+              kind: 'daily',
+              hour: schedule.kind === 'interval' ? schedule.hourStart : 9,
+              minute: 0,
+              timezone: schedule.timezone,
+              weekdays: schedule.weekdays,
+            },
+          }),
+        );
+        return;
+      }
+      if (kind === 'interval' && schedule.kind !== 'interval') {
+        dispatch(
+          CurrentTaskActions.patchCurrentTask({
+            schedule: {
+              kind: 'interval',
+              intervalMinutes: 15,
+              timezone: schedule.timezone,
+              weekdays: schedule.weekdays,
+              hourStart: schedule.kind === 'daily' ? schedule.hour : 8,
+              hourEnd: schedule.kind === 'daily' ? schedule.hour + 1 : 17,
+            },
+          }),
+        );
+      }
+    },
+    [dispatch, schedule],
+  );
+
   if (!task.id) {
     return null;
   }
@@ -224,74 +261,128 @@ export const TaskDetailEditForm = () => {
         </fieldset>
 
         <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>Schedule (cron window)</legend>
+          <legend className={styles.legend}>Schedule</legend>
+          <label className={styles.label}>
+            Frequency
+            <select
+              className={styles.input}
+              value={isDaily ? 'daily' : 'interval'}
+              onChange={(e) => setScheduleKind(e.target.value === 'daily' ? 'daily' : 'interval')}
+            >
+              <option value="daily">Once daily (e.g. morning job)</option>
+              <option value="interval">Repeating interval in a time window</option>
+            </select>
+          </label>
           <div className={styles.grid}>
-            <label className={styles.label}>
-              Interval (minutes)
-              <input
-                className={styles.input}
-                type="number"
-                min={1}
-                max={1440}
-                value={task.schedule.intervalMinutes}
-                onChange={(e) =>
-                  dispatch(
-                    CurrentTaskActions.patchCurrentTask({
-                      schedule: {
-                        ...task.schedule,
-                        intervalMinutes: Number(e.target.value),
-                      },
-                    }),
-                  )
-                }
-                required
-              />
-            </label>
+            {isDaily ? (
+              <>
+                <label className={styles.label}>
+                  Hour (0–23)
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min={0}
+                    max={23}
+                    value={schedule.hour}
+                    onChange={(e) =>
+                      dispatch(
+                        CurrentTaskActions.patchCurrentTask({
+                          schedule: { ...schedule, hour: Number(e.target.value) },
+                        }),
+                      )
+                    }
+                    required
+                  />
+                </label>
+                <label className={styles.label}>
+                  Minute (0–59)
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min={0}
+                    max={59}
+                    value={schedule.minute}
+                    onChange={(e) =>
+                      dispatch(
+                        CurrentTaskActions.patchCurrentTask({
+                          schedule: { ...schedule, minute: Number(e.target.value) },
+                        }),
+                      )
+                    }
+                    required
+                  />
+                </label>
+              </>
+            ) : (
+              <>
+                <label className={styles.label}>
+                  Interval (minutes)
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min={1}
+                    max={1440}
+                    value={schedule.intervalMinutes}
+                    onChange={(e) =>
+                      dispatch(
+                        CurrentTaskActions.patchCurrentTask({
+                          schedule: {
+                            ...schedule,
+                            intervalMinutes: Number(e.target.value),
+                          },
+                        }),
+                      )
+                    }
+                    required
+                  />
+                </label>
+                <label className={styles.label}>
+                  Hour start (0–23)
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min={0}
+                    max={23}
+                    value={schedule.hourStart}
+                    onChange={(e) =>
+                      dispatch(
+                        CurrentTaskActions.patchCurrentTask({
+                          schedule: { ...schedule, hourStart: Number(e.target.value) },
+                        }),
+                      )
+                    }
+                    required
+                  />
+                </label>
+                <label className={styles.label}>
+                  Hour end (0–23, exclusive)
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min={0}
+                    max={23}
+                    value={schedule.hourEnd}
+                    onChange={(e) =>
+                      dispatch(
+                        CurrentTaskActions.patchCurrentTask({
+                          schedule: { ...schedule, hourEnd: Number(e.target.value) },
+                        }),
+                      )
+                    }
+                    required
+                  />
+                </label>
+              </>
+            )}
             <label className={styles.label}>
               Timezone
               <input
                 className={styles.input}
-                value={task.schedule.timezone}
+                value={schedule.timezone}
                 onChange={(e) =>
                   dispatch(
                     CurrentTaskActions.patchCurrentTask({
-                      schedule: { ...task.schedule, timezone: e.target.value },
-                    }),
-                  )
-                }
-                required
-              />
-            </label>
-            <label className={styles.label}>
-              Hour start (0–23)
-              <input
-                className={styles.input}
-                type="number"
-                min={0}
-                max={23}
-                value={task.schedule.hourStart}
-                onChange={(e) =>
-                  dispatch(
-                    CurrentTaskActions.patchCurrentTask({
-                      schedule: { ...task.schedule, hourStart: Number(e.target.value) },
-                    }),
-                  )
-                }
-                required
-              />
-            </label>
-            <label className={styles.label}>
-              Hour end (0–23)
-              <input
-                className={styles.input}
-                type="number"
-                min={0}
-                max={23}
-                value={task.schedule.hourEnd}
-                onChange={(e) =>
-                  dispatch(
-                    CurrentTaskActions.patchCurrentTask({
-                      schedule: { ...task.schedule, hourEnd: Number(e.target.value) },
+                      schedule: { ...schedule, timezone: e.target.value },
                     }),
                   )
                 }
@@ -306,7 +397,7 @@ export const TaskDetailEditForm = () => {
                 <label key={option.value} className={styles.weekdayChip}>
                   <input
                     type="checkbox"
-                    checked={task.schedule.weekdays.includes(option.value)}
+                    checked={schedule.weekdays.includes(option.value)}
                     onChange={() => toggleWeekday(option.value)}
                     className={styles.checkbox}
                   />

@@ -6,6 +6,16 @@ import { TASKS_PATH } from '@/config/routes';
 import { useAppDispatch } from '@/store';
 import { createTaskThunk } from '@/store/thunks/tasks/createTaskThunk';
 import type { CreateTaskPayload } from '@/api/tasks';
+import type { IntervalTaskSchedule } from '@/model';
+
+const defaultIntervalSchedule: IntervalTaskSchedule = {
+  kind: 'interval',
+  intervalMinutes: 15,
+  timezone: 'America/New_York',
+  weekdays: [1, 2, 3, 4, 5],
+  hourStart: 8,
+  hourEnd: 17,
+};
 
 const defaultPayload: CreateTaskPayload = {
   id: '',
@@ -22,14 +32,7 @@ const defaultPayload: CreateTaskPayload = {
     method: 'POST',
     path: '/api/data/example/process-due',
   },
-  schedule: {
-    kind: 'interval',
-    intervalMinutes: 15,
-    timezone: 'America/New_York',
-    weekdays: [1, 2, 3, 4, 5],
-    hourStart: 8,
-    hourEnd: 17,
-  },
+  schedule: defaultIntervalSchedule,
   lifecycle: 'start_if_needed_stop_if_started',
 };
 
@@ -148,12 +151,16 @@ export const TaskCreatePage = () => {
           <input
             className={styles.input}
             type="number"
-            value={form.schedule.intervalMinutes}
+            value={
+              form.schedule.kind === 'interval' ? form.schedule.intervalMinutes : 15
+            }
             onChange={(e) =>
               setForm({
                 ...form,
                 schedule: {
-                  ...form.schedule,
+                  ...(form.schedule.kind === 'interval'
+                    ? form.schedule
+                    : defaultIntervalSchedule),
                   intervalMinutes: Number(e.target.value),
                 },
               })
