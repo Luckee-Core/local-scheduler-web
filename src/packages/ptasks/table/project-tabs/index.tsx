@@ -13,41 +13,67 @@ type PtasksProjectTabsProps = {
 export const PtasksProjectTabs = (props: PtasksProjectTabsProps) => {
   const { projects, selectedProjectId, onSelectProjectId } = props;
 
+  const tabs = [
+    { id: ALL_PROJECTS_TAB_ID, label: 'All' },
+    ...projects.map((project) => ({ id: project.projectId, label: project.projectName })),
+  ];
+
   return (
-    <div className={styles.bar} role="tablist" aria-label="Filter by project">
-      <button
-        type="button"
-        role="tab"
-        aria-selected={selectedProjectId === ALL_PROJECTS_TAB_ID}
-        className={styles.tab(selectedProjectId === ALL_PROJECTS_TAB_ID)}
-        onClick={() => onSelectProjectId(ALL_PROJECTS_TAB_ID)}
-      >
-        All
-      </button>
-      {projects.map((project) => (
-        <button
-          key={project.projectId}
-          type="button"
-          role="tab"
-          aria-selected={selectedProjectId === project.projectId}
-          className={styles.tab(selectedProjectId === project.projectId)}
-          onClick={() => onSelectProjectId(project.projectId)}
-        >
-          {project.projectName}
-        </button>
-      ))}
+    <div className={styles.container} role="tablist" aria-label="Filter by project">
+      {tabs.map((tab) => {
+        const isActive = selectedProjectId === tab.id;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            className={isActive ? styles.activeTab : styles.inactiveTab}
+            onClick={() => onSelectProjectId(tab.id)}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
     </div>
   );
 };
 
 const styles = {
-  bar: `
-    flex flex-wrap gap-1 border-b border-gray-200
+  container: `
+    bg-white
+    flex flex-wrap items-center gap-1
+    border-b border-gray-200
+    px-1
+    pt-2
   `,
-  tab: (active: boolean) =>
-    `-mb-px rounded-t-md px-3 py-2 text-sm font-medium transition-colors ${
-      active
-        ? 'border border-b-white border-gray-200 bg-white text-gray-900'
-        : 'border border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100/80'
-    }`,
+  activeTab: `
+    px-4 py-2
+    text-sm font-medium text-blue-600
+    border-b-2 border-blue-600
+    border-t-0 border-l-0 border-r-0
+    transition-colors
+    focus:outline-none
+    focus:ring-2
+    focus:ring-blue-500
+    rounded-t
+    bg-transparent
+    cursor-pointer
+    -mb-px
+  `,
+  inactiveTab: `
+    px-4 py-2
+    text-sm font-medium text-gray-600
+    hover:text-gray-900
+    border-b-2 border-transparent
+    border-t-0 border-l-0 border-r-0
+    transition-colors
+    focus:outline-none
+    focus:ring-2
+    focus:ring-blue-500
+    rounded-t
+    bg-transparent
+    cursor-pointer
+    -mb-px
+  `,
 };

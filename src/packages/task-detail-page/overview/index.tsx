@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { detailPageStyles } from '@/components/detail-page-styles';
 import { useAppSelector } from '@/store';
-import { formatTimestamp } from '@/packages/ptasks/format-timestamp';
+import { TaskDetailSummaryActions } from '../actions';
 
 export const TaskDetailOverview = () => {
   const currentTask = useAppSelector((state) => state.currentTask);
@@ -11,72 +11,80 @@ export const TaskDetailOverview = () => {
 
   const task = tasks[currentTask.id] ?? currentTask;
   const isRunning = schedulerBuilder.runningTaskIds.includes(task.id);
-
-  const workerLabel = useMemo(() => {
-    if (task.schedulerProjectRepo.executionType === 'production') {
-      return task.schedulerProjectRepo.expressRepoName;
-    }
-    if (task.expressDir) {
-      return `${task.schedulerProjectRepoId} · ${task.worker.expressRepoName}`;
-    }
-    return `${task.schedulerProjectRepoId} (no path configured)`;
-  }, [task]);
-
-  const statusLabel = isRunning ? 'Running…' : task.lastRunStatus ?? 'Idle';
   const isProduction = task.schedulerProjectRepo.executionType === 'production';
 
-  return (
-    <section className={styles.section}>
-      <h1 className={styles.title}>{currentTask.name || task.name}</h1>
-      <p className={styles.subtitle}>Task ID: {task.id}</p>
+  const statusLabel = isRunning ? 'Running…' : task.lastRunStatus ?? 'Idle';
 
-      <dl className={styles.grid}>
+  const railwayUrl = task.schedulerProjectRepo.productionBaseUrl ?? '';
+
+  return (
+    <section className={detailPageStyles.panel}>
+      <div className={detailPageStyles.panelHeader}>
+        <div>
+          <h1 className={detailPageStyles.panelTitle}>{task.name}</h1>
+          <p className={detailPageStyles.panelSubtitle}>Task ID: {task.id}</p>
+        </div>
+        <TaskDetailSummaryActions />
+      </div>
+
+      <dl className={`${detailPageStyles.panelBody} ${styles.grid}`}>
         <div className={styles.row}>
-          <dt className={styles.label}>Business</dt>
-          <dd className={styles.value}>{task.schedulerProject.name}</dd>
+          <dt className={detailPageStyles.fieldLabel}>Display name</dt>
+          <dd className={detailPageStyles.fieldValue}>{task.name}</dd>
         </div>
         <div className={styles.row}>
-          <dt className={styles.label}>Execution target</dt>
-          <dd className={styles.value}>
+          <dt className={detailPageStyles.fieldLabel}>Worker project id</dt>
+          <dd className={styles.valueMono}>{task.workerProjectId}</dd>
+        </div>
+
+        <div className={styles.row}>
+          <dt className={detailPageStyles.fieldLabel}>Business</dt>
+          <dd className={detailPageStyles.fieldValue}>{task.schedulerProject.name}</dd>
+        </div>
+        <div className={styles.row}>
+          <dt className={detailPageStyles.fieldLabel}>Repo</dt>
+          <dd className={styles.valueMono}>{task.schedulerProjectRepoId}</dd>
+        </div>
+
+        <div className={styles.row}>
+          <dt className={detailPageStyles.fieldLabel}>Environment</dt>
+          <dd className={styles.valueRow}>
             <span className={styles.typeBadge(isProduction)}>
               {isProduction ? 'Production' : 'Local'}
             </span>
-            <span className={styles.targetText}>{task.executionTarget || '—'}</span>
           </dd>
         </div>
         <div className={styles.row}>
-          <dt className={styles.label}>Repo</dt>
-          <dd className={styles.valueMono}>{task.schedulerProjectRepoId}</dd>
-        </div>
-        <div className={styles.row}>
-          <dt className={styles.label}>Worker</dt>
-          <dd className={styles.value}>{workerLabel}</dd>
-        </div>
-        <div className={styles.row}>
-          <dt className={styles.label}>Express path</dt>
-          <dd className={styles.valueMono}>{task.expressDir ?? '—'}</dd>
-        </div>
-        <div className={styles.row}>
-          <dt className={styles.label}>Lifecycle</dt>
-          <dd className={styles.valueMono}>{task.lifecycle}</dd>
-        </div>
-        <div className={styles.row}>
-          <dt className={styles.label}>Resolved port</dt>
-          <dd className={styles.value}>{task.port}</dd>
-        </div>
-        <div className={styles.row}>
-          <dt className={styles.label}>Last run</dt>
-          <dd className={styles.value}>{formatTimestamp(task.lastRunAt)}</dd>
-        </div>
-        <div className={styles.row}>
-          <dt className={styles.label}>Next run</dt>
-          <dd className={styles.value}>{formatTimestamp(task.nextRunAt)}</dd>
-        </div>
-        <div className={styles.row}>
-          <dt className={styles.label}>Status</dt>
-          <dd className={styles.value}>
+          <dt className={detailPageStyles.fieldLabel}>Status</dt>
+          <dd className={detailPageStyles.fieldValue}>
             <span className={styles.statusBadge(isRunning, task.lastRunStatus)}>{statusLabel}</span>
           </dd>
+        </div>
+
+        <div className={styles.rowFull}>
+          <dt className={detailPageStyles.fieldLabel}>Railway URL</dt>
+          <dd className={styles.fieldBlock}>
+            <input
+              type="url"
+              className={detailPageStyles.formInput}
+              value={isProduction ? railwayUrl : ''}
+              placeholder={isProduction ? '—' : 'Not used for local workers'}
+              readOnly
+              aria-readonly="true"
+            />
+          </dd>
+        </div>
+
+        {!isProduction ? (
+          <div className={styles.rowFull}>
+            <dt className={detailPageStyles.fieldLabel}>Express path</dt>
+            <dd className={styles.valueMono}>{task.expressDir ?? '—'}</dd>
+          </div>
+        ) : null}
+
+        <div className={styles.row}>
+          <dt className={detailPageStyles.fieldLabel}>Lifecycle</dt>
+          <dd className={styles.valueMono}>{task.lifecycle}</dd>
         </div>
       </dl>
     </section>
@@ -84,47 +92,38 @@ export const TaskDetailOverview = () => {
 };
 
 const styles = {
-  section: `
-    rounded-lg border border-gray-200 bg-white p-6 shadow-sm
-  `,
-  title: `
-    text-xl font-semibold text-gray-900
-  `,
-  subtitle: `
-    mt-1 text-sm text-gray-500 font-mono
-  `,
   grid: `
-    mt-6 grid gap-4 sm:grid-cols-2
+    grid gap-4 sm:grid-cols-2
   `,
   row: `
     space-y-1
   `,
-  label: `
-    text-xs font-semibold uppercase tracking-wide text-gray-500
+  rowFull: `
+    space-y-1 sm:col-span-2
   `,
-  value: `
+  fieldBlock: `
+    max-w-xl
+  `,
+  valueRow: `
     text-sm text-gray-900 flex flex-wrap items-center gap-2
-  `,
-  targetText: `
-    text-sm text-gray-800
   `,
   valueMono: `
     text-xs font-mono text-gray-700 break-all
   `,
   typeBadge: (production: boolean) =>
     production
-      ? 'inline-flex rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-800'
-      : 'inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700',
+      ? 'inline-flex rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-medium text-violet-800'
+      : 'inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-700',
   statusBadge: (running: boolean, lastStatus: string | null) => {
     if (running) {
-      return 'inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700';
+      return 'inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700';
     }
     if (lastStatus === 'failed') {
-      return 'inline-flex rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700';
+      return 'inline-flex rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-700';
     }
     if (lastStatus === 'success') {
-      return 'inline-flex rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700';
+      return 'inline-flex rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700';
     }
-    return 'inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600';
+    return 'inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-600';
   },
 };

@@ -6,3 +6,6 @@ export { createTaskThunk } from './createTaskThunk';
 export { deleteTaskThunk } from './deleteTaskThunk';
 export { saveTaskThunk } from './saveTaskThunk';
 export { resetCurrentTaskFromDumpThunk } from './resetCurrentTaskFromDumpThunk';
+export { startConfigurationSectionEditThunk } from './startConfigurationSectionEditThunk';
+export { cancelConfigurationSectionEditThunk } from './cancelConfigurationSectionEditThunk';
+export { saveConfigurationSectionEditThunk } from './saveConfigurationSectionEditThunk';

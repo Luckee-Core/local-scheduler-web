@@ -2,13 +2,18 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { detailPageStyles } from '@/components/detail-page-styles';
 import { TASKS_PATH } from '@/config/routes';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { BreadcrumbBuilderActions } from '@/store/builders/breadcrumbBuilder';
 import { getAllRunsThunk, getAllTasksThunk } from '@/store/thunks';
 import { TaskDetailOverview } from './overview';
-import { TaskDetailEditForm } from './edit-form';
-import { TaskDetailActions } from './actions';
+import {
+  TaskConfigurationHttpRequestSection,
+  TaskConfigurationScheduleSection,
+  TaskConfigurationTaskSection,
+  TaskConfigurationWorkerProcessSection,
+} from './edit-form';
 import { TaskDetailRunHistory } from './run-history';
 import { TaskDetailBuilderActions } from '@/store/builders/taskDetailBuilder';
 
@@ -26,7 +31,7 @@ export const TaskDetailPage = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(TaskDetailBuilderActions.resetSaveState());
+    dispatch(TaskDetailBuilderActions.resetConfigurationUi());
   }, [currentTask.id, dispatch]);
 
   useEffect(() => {
@@ -58,20 +63,19 @@ export const TaskDetailPage = () => {
   }
 
   return (
-    <div className={styles.page}>
-      <TaskDetailActions />
+    <div className={detailPageStyles.page}>
       <TaskDetailOverview />
-      <TaskDetailEditForm />
+      <TaskConfigurationTaskSection />
+      <TaskConfigurationWorkerProcessSection />
+      <TaskConfigurationHttpRequestSection />
+      <TaskConfigurationScheduleSection />
       <TaskDetailRunHistory />
     </div>
   );
 };
 
 const styles = {
-  page: `
-    w-full space-y-6
-  `,
   message: `
-    text-gray-600
+    text-sm text-gray-600
   `,
 };

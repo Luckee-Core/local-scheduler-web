@@ -17,7 +17,11 @@ Architecture Decision Records (ADRs) for **nextjs-template** and Next.js apps cr
 11. [011 – Domain models (`src/model`)](./011-domain-models.md) — persisted entity types.
 12. [012 – Package form inputs](./012-package-form-inputs.md) — Task create/edit forms.
 13. [013 – Scheduler dashboard UI](./013-scheduler-dashboard-ui.md) — `packages/ptasks/` table/row composition.
-15. [015 – No SQL functions](./015-no-sql-functions.md) — this app does not own schema.
+14. [015 – No SQL functions](./015-no-sql-functions.md) — this app does not own schema.
+15. [016 – Interactive cursor affordance](./016-interactive-cursor-affordance.md) — `cursor-pointer` on interactive controls.
+16. [032 – App layout header and breadcrumbs](./032-app-layout-header-and-breadcrumbs.md) — lucide sidebar toggle, breadcrumb trail.
+17. [033 – Detail page layout chrome](./033-detail-page-layout-chrome.md) — `detailPageStyles`, full-width detail routes.
+18. [035 – List table filter bars](./035-list-table-filter-bars.md) — `listFilterBarStyles` / `listTableStyles` when tables have filters.
 
 Stripe ADRs (014 in template) are **not applicable**.
 

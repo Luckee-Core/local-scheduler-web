@@ -22,68 +22,93 @@ export const Sidebar = () => {
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.logoArea}>
-        <Link href={TASKS_PATH} className={styles.logoLink}>
-          <span className={styles.logoMark}>LS</span>
-          <span className={styles.logoText}>Local Scheduler</span>
-        </Link>
-      </div>
-
-      <nav className={styles.nav}>
-        {sections.map((section) => (
-          <div key={section.title} className={styles.navGroup}>
-            <p className={styles.navGroupTitle}>{section.title}</p>
-            <div className={styles.navGroupItems}>
-              {section.links.map((link) => {
-                const active = isActiveHref(link.href);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={styles.navLink(active)}
-                  >
-                    {link.name}
-                  </Link>
-                );
-              })}
-            </div>
+      <div className={styles.inner}>
+        <div className={styles.brandPanel}>
+          <div className={styles.logoMark}>LS</div>
+          <div className={styles.brandTextGroup}>
+            <span className={styles.logoText}>Local Scheduler</span>
+            <span className={styles.logoHint}>Workspace</span>
           </div>
-        ))}
-      </nav>
+        </div>
+
+        <nav className={styles.navigation} aria-label="Primary">
+          {sections.map((section) => (
+            <div key={section.title} className={styles.navGroup}>
+              <p className={styles.navLabel}>{section.title}</p>
+              <ul className={styles.menuList}>
+                {section.links.map((link) => {
+                  const active = isActiveHref(link.href);
+                  return (
+                    <li key={link.href} className={styles.menuItem}>
+                      <Link
+                        href={link.href}
+                        className={`${styles.menuButton} ${
+                          active ? styles.menuButtonActive : styles.menuButtonInactive
+                        }`}
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      </div>
     </aside>
   );
 };
 
 const styles = {
   sidebar: `
-    w-56 flex flex-col border-r border-zinc-800 bg-zinc-900 text-zinc-100 shrink-0 self-stretch
+    relative flex h-screen w-[15.5rem] flex-col shrink-0
+    border-r border-gray-300 bg-white overflow-y-auto
   `,
-  logoArea: `
-    flex items-center px-4 py-4 border-b border-zinc-800 shrink-0
+  inner: `
+    flex h-full flex-1 flex-col gap-4 p-3
   `,
-  logoLink: `
-    flex items-center gap-2.5 min-w-0
+  brandPanel: `
+    flex items-center gap-2.5 rounded border border-gray-300 bg-gray-50 px-3 py-2.5
   `,
   logoMark: `
-    flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-500 text-sm font-bold text-white
+    flex h-8 w-8 shrink-0 items-center justify-center rounded
+    border border-gray-300 bg-gray-900 text-[10px] font-bold tracking-tight text-white
+  `,
+  brandTextGroup: `
+    flex min-w-0 flex-col
   `,
   logoText: `
-    truncate text-sm font-semibold text-zinc-100
+    text-sm font-semibold text-gray-900 tracking-tight truncate
   `,
-  nav: `
-    flex-1 overflow-y-auto px-2 py-3
+  logoHint: `
+    text-[10px] font-semibold uppercase tracking-wide text-gray-500
+  `,
+  navigation: `
+    flex-1 overflow-y-auto
   `,
   navGroup: `
-    mb-4
+    mb-2
   `,
-  navGroupTitle: `
-    px-2 mb-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500
+  navLabel: `
+    mb-2 px-2 text-[10px] font-semibold uppercase tracking-wide text-gray-500
   `,
-  navGroupItems: `
-    space-y-0.5
+  menuList: `
+    flex flex-col gap-0.5
   `,
-  navLink: (active: boolean) =>
-    `block rounded-md px-2.5 py-2 text-sm transition-colors ${
-      active ? 'bg-zinc-800 text-white' : 'text-zinc-300 hover:bg-zinc-800/50 hover:text-white'
-    }`,
+  menuItem: `
+    group relative
+  `,
+  menuButton: `
+    flex w-full items-center gap-2 rounded px-2.5 py-2 text-xs font-medium
+    text-gray-700 transition-colors cursor-pointer
+    hover:bg-gray-50 hover:text-gray-900
+  `,
+  menuButtonActive: `
+    bg-gray-100 text-gray-900 font-semibold
+    ring-1 ring-inset ring-gray-300
+  `,
+  menuButtonInactive: `
+    bg-transparent
+  `,
 };

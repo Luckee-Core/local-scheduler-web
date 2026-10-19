@@ -6,12 +6,16 @@ export const formatTimestamp = (iso: string | null): string => {
     return '—';
   }
   try {
-    return new Date(iso).toLocaleString(undefined, {
+    const date = new Date(iso);
+    const datePart = date.toLocaleString(undefined, {
       month: 'short',
       day: 'numeric',
+    });
+    const timePart = date.toLocaleString(undefined, {
       hour: 'numeric',
       minute: '2-digit',
     });
+    return `${datePart} · ${timePart}`;
   } catch {
     return iso;
   }

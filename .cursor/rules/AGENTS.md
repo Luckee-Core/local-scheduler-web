@@ -2,7 +2,7 @@
 
 BEFORE implementing ANY feature, you MUST:
 1. Read `.cursor/architecture/README.md`.
-2. Read the relevant ADRs (**001–013**, **015**).
+2. Read the relevant ADRs (**001–013**, **015–016**, **032–033**, **035**).
 3. Follow documented patterns EXACTLY; if no pattern exists, add an ADR first.
 
 ## Redux — zero selector functions
@@ -41,6 +41,8 @@ BEFORE implementing ANY feature, you MUST:
 ### Styling
 1. Styles object pattern per [003](./architecture/003-styling-rules.md).
 2. No inline `style={{}}` or per-component CSS modules.
+3. Shared panel/table tokens: `detailPageStyles`, `listTableStyles`, `listFilterBarStyles` in `src/components/` per [033](./architecture/033-detail-page-layout-chrome.md) and [035](./architecture/035-list-table-filter-bars.md).
+4. `cursor-pointer` on interactive controls per [016](./architecture/016-interactive-cursor-affordance.md).
 
 ### API
 1. Handlers in `src/app/api/**/route.ts`; thin handlers, typed DTOs.
@@ -56,3 +58,7 @@ BEFORE implementing ANY feature, you MUST:
 - [008 – Detail page routing](./architecture/008-detail-page-routing.md)
 - [007 – Starter layout](./architecture/007-starter-template-layout.md)
 - [010 – Public Express reads](./architecture/010-public-blog-express-fetch.md)
+- [016 – Interactive cursor affordance](./architecture/016-interactive-cursor-affordance.md)
+- [032 – App layout header and breadcrumbs](./architecture/032-app-layout-header-and-breadcrumbs.md)
+- [033 – Detail page layout chrome](./architecture/033-detail-page-layout-chrome.md)
+- [035 – List table filter bars](./architecture/035-list-table-filter-bars.md)

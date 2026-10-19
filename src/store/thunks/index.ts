@@ -7,5 +7,8 @@ export {
   deleteTaskThunk,
   saveTaskThunk,
   resetCurrentTaskFromDumpThunk,
+  startConfigurationSectionEditThunk,
+  cancelConfigurationSectionEditThunk,
+  saveConfigurationSectionEditThunk,
 } from './tasks';
 export { getAllRunsThunk } from './runs';

@@ -1,10 +1,13 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { detailPageStyles } from '@/components/detail-page-styles';
+import { listTableStyles } from '@/components/list-table-styles';
 import { useAppSelector } from '@/store';
 import { groupTasksByHour, listProjectTabs } from '../group-tasks-for-dashboard';
 import { ALL_PROJECTS_TAB_ID, PtasksProjectTabs } from './project-tabs';
 import { PtasksTaskTimeline } from './task-timeline';
+import { ptasksTableGridColsClass } from './task-grid-columns';
 
 export const PtasksTable = () => {
   const tasks = useAppSelector((state) => state.tasks);
@@ -44,30 +47,43 @@ export const PtasksTable = () => {
   }, [runs]);
 
   if (schedulerBuilder.isLoadingTasks && taskList.length === 0) {
-    return <p className={styles.empty}>Loading tasks…</p>;
+    return (
+      <div className={listTableStyles.wrapper}>
+        <div className={listTableStyles.emptyState}>
+          <p className={listTableStyles.emptyText}>Loading tasks…</p>
+        </div>
+      </div>
+    );
   }
 
   if (taskList.length === 0) {
     return (
-      <p className={styles.empty}>
-        No scheduled tasks found. Use <strong>Add task</strong> in the sidebar, run{' '}
-        <code className={styles.code}>npm run db:seed</code> on the express server, or{' '}
-        <code className={styles.code}>POST /api/tasks</code> from another project.
-      </p>
+      <div className={listTableStyles.wrapper}>
+        <div className={detailPageStyles.emptyState}>
+          <p className={detailPageStyles.fieldValue}>
+            No scheduled tasks found. Use <strong>Add task</strong> in the sidebar, run{' '}
+            <code className={styles.code}>npm run db:seed</code> on the express server, or{' '}
+            <code className={styles.code}>POST /api/tasks</code> from another project.
+          </p>
+        </div>
+      </div>
     );
   }
 
   const showProjectOnTask = selectedProjectId === ALL_PROJECTS_TAB_ID;
 
   return (
-    <div className={styles.wrapper}>
+    <div className={listTableStyles.wrapper}>
       <PtasksProjectTabs
         projects={projectTabs}
         selectedProjectId={selectedProjectId}
         onSelectProjectId={setSelectedProjectId}
       />
 
-      <div className={styles.columnHeaders} aria-hidden="true">
+      <div
+        className={`${listTableStyles.columnHeaderRow} ${ptasksTableGridColsClass}`}
+        aria-hidden="true"
+      >
         <span>Task</span>
         <span>How often</span>
         <span>Active</span>
@@ -75,7 +91,9 @@ export const PtasksTable = () => {
       </div>
 
       {buckets.length === 0 ? (
-        <p className={styles.emptyFiltered}>No tasks for this project.</p>
+        <div className={listTableStyles.emptyState}>
+          <p className={listTableStyles.emptyText}>No tasks for this project.</p>
+        </div>
       ) : (
         <PtasksTaskTimeline
           buckets={buckets}
@@ -88,22 +106,10 @@ export const PtasksTable = () => {
 };
 
 const styles = {
-  wrapper: `
-    flex w-full flex-col gap-4
-  `,
-  columnHeaders: `
-    hidden sm:grid sm:grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_5rem_8rem] sm:gap-4 sm:px-1 sm:text-xs sm:font-semibold sm:uppercase sm:tracking-wide sm:text-gray-400
+  code: `
+    rounded bg-gray-100 px-1 py-0.5 font-mono text-xs
   `,
   lastRunHeader: `
     sm:text-right
-  `,
-  empty: `
-    rounded-lg border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-gray-600
-  `,
-  emptyFiltered: `
-    py-8 text-center text-sm text-gray-500
-  `,
-  code: `
-    rounded bg-gray-100 px-1 py-0.5 font-mono text-xs
   `,
 };

@@ -3,7 +3,7 @@ import { PtasksPage } from '@/packages/ptasks';
 
 export default function DashboardPage() {
   return (
-    <AppLayout fullWidth>
+    <AppLayout>
       <PtasksPage />
     </AppLayout>
   );

@@ -53,13 +53,13 @@ const styles = {
     space-y-1
   `,
   hourDivider: `
-    flex items-center gap-3
+    flex items-center gap-3 px-3 pt-4 pb-1
   `,
   hourLabel: `
-    shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-500
+    shrink-0 text-xs font-semibold text-gray-600 tabular-nums
   `,
   hourLine: `
-    h-px flex-1 bg-gray-200
+    h-px flex-1 bg-gray-300
   `,
   list: `
     m-0 list-none space-y-0 p-0

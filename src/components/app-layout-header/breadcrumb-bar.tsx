@@ -48,7 +48,7 @@ const styles = {
     relative flex min-w-0 items-center gap-2 text-xs font-medium text-gray-600
   `,
   breadcrumbLink: `
-    truncate text-xs font-medium text-gray-600 transition-colors hover:text-gray-900 focus:outline-none
+    truncate text-xs font-medium text-gray-600 transition-colors hover:text-gray-900 focus:outline-none cursor-pointer
   `,
   breadcrumbCurrent: `
     truncate text-xs font-medium text-gray-900

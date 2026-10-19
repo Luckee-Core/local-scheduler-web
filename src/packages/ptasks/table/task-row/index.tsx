@@ -9,6 +9,8 @@ import { setCurrentTaskThunk } from '@/store/thunks';
 import { formatTaskDisplayName } from '../../format-task-display-name';
 import { formatTaskFrequency } from '../../format-task-frequency';
 import { formatTimestamp } from '../../format-timestamp';
+import { listTableStyles } from '@/components/list-table-styles';
+import { ptasksTableGridColsClass } from '../task-grid-columns';
 
 type PtasksTaskRowProps = {
   task: ScheduledTask;
@@ -47,18 +49,18 @@ export const PtasksTaskRow = (props: PtasksTaskRowProps) => {
 
 const styles = {
   row: (muted: boolean) =>
-    `grid w-full grid-cols-1 gap-1 border-b border-gray-100 px-1 py-2.5 text-left transition-colors sm:grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_5rem_8rem] sm:items-center sm:gap-4 ${
+    `grid w-full grid-cols-1 gap-2 border-b border-gray-200 px-3 py-3 text-left transition-colors ${ptasksTableGridColsClass} sm:items-center sm:gap-x-4 sm:gap-y-0 ${listTableStyles.row} ${
       muted ? 'opacity-60' : ''
-    } hover:bg-gray-50 cursor-pointer`,
+    }`,
   cellName: `
-    text-sm font-medium text-gray-900
+    text-xs font-medium text-gray-900
   `,
   cellFrequency: `
-    text-sm text-gray-600
+    text-xs text-gray-600
   `,
   cellActive: (active: boolean) =>
-    `text-sm font-medium ${active ? 'text-green-700' : 'text-gray-500'}`,
+    `text-xs font-medium ${active ? 'text-green-700' : 'text-gray-500'}`,
   cellLastRun: `
-    text-sm text-gray-600 sm:text-right
+    text-xs text-gray-600 tabular-nums whitespace-nowrap sm:text-right
   `,
 };

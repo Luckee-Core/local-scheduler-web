@@ -20,7 +20,7 @@ export const formatClock = (hour: number, minute: number): string => {
   const h12 = hour % 12 === 0 ? 12 : hour % 12;
   const ampm = hour < 12 ? 'AM' : 'PM';
   const min = minute === 0 ? '' : `:${String(minute).padStart(2, '0')}`;
-  return `${h12}${min} ${ampm}`;
+  return `${h12}${min}\u00a0${ampm}`;
 };
 
 /**

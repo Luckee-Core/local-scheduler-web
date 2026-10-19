@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { detailPageStyles } from '@/components/detail-page-styles';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { getAllRunsThunk, getAllTasksThunk } from '@/store/thunks';
 import { PtasksTable } from '../table';
@@ -17,11 +18,11 @@ export const PtasksDashboard = () => {
   const isRefreshing = schedulerBuilder.isLoadingTasks || schedulerBuilder.isLoadingRuns;
 
   return (
-    <div className={styles.container}>
+    <div className={detailPageStyles.page}>
       <div className={styles.toolbar}>
         <div>
-          <h1 className={styles.title}>Scheduled tasks</h1>
-          <p className={styles.subtitle}>
+          <h1 className={detailPageStyles.pageTitle}>Scheduled tasks</h1>
+          <p className={detailPageStyles.pageSubtitle}>
             Local cron jobs that call worker Express APIs on a schedule.
           </p>
         </div>
@@ -29,7 +30,7 @@ export const PtasksDashboard = () => {
           type="button"
           onClick={handleRefresh}
           disabled={isRefreshing}
-          className={styles.refreshButton(isRefreshing)}
+          className={detailPageStyles.secondaryButton}
         >
           {isRefreshing ? 'Refreshing…' : 'Refresh'}
         </button>
@@ -47,25 +48,10 @@ export const PtasksDashboard = () => {
 };
 
 const styles = {
-  container: `
-    space-y-4
-  `,
   toolbar: `
     flex flex-wrap items-start justify-between gap-4
   `,
-  title: `
-    text-xl font-semibold text-gray-900
-  `,
-  subtitle: `
-    mt-1 text-sm text-gray-600
-  `,
-  refreshButton: (disabled: boolean) =>
-    `rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-      disabled
-        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-        : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 cursor-pointer'
-    }`,
   error: `
-    rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700
+    rounded border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700
   `,
 };
