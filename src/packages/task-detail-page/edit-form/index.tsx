@@ -4,6 +4,13 @@ import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { CurrentTaskActions } from '@/store/current/currentTask';
 import { resetCurrentTaskFromDumpThunk, saveTaskThunk } from '@/store/thunks';
+import {
+  buildDailyScheduleFromMode,
+  buildIntervalScheduleFromPrevious,
+  getScheduleFrequencyMode,
+  patchIntervalStartHour,
+  type ScheduleFrequencyMode,
+} from '@/packages/ptasks/schedule-frequency-mode';
 
 const WEEKDAY_OPTIONS: { value: number; label: string }[] = [
   { value: 0, label: 'Sun' },
@@ -34,54 +41,58 @@ export const TaskDetailEditForm = () => {
     dispatch(resetCurrentTaskFromDumpThunk());
   }, [dispatch]);
 
+  const schedule = task.schedule;
+  const frequencyMode = getScheduleFrequencyMode(schedule);
+  const isInterval = schedule.kind === 'interval';
+
   const toggleWeekday = useCallback(
     (day: number) => {
-      const set = new Set(task.schedule.weekdays);
+      if (frequencyMode === 'weekly' && schedule.kind === 'daily') {
+        dispatch(
+          CurrentTaskActions.patchCurrentTask({
+            schedule: { ...schedule, weekdays: [day] },
+          }),
+        );
+        return;
+      }
+
+      const set = new Set(schedule.weekdays);
       if (set.has(day)) {
         set.delete(day);
       } else {
         set.add(day);
       }
       const weekdays = [...set].sort((a, b) => a - b);
+      if (weekdays.length === 0) {
+        return;
+      }
       dispatch(
         CurrentTaskActions.patchCurrentTask({
-          schedule: { ...task.schedule, weekdays },
+          schedule: { ...schedule, weekdays },
         }),
       );
     },
-    [dispatch, task.schedule],
+    [dispatch, frequencyMode, schedule],
   );
 
-  const schedule = task.schedule;
-  const isDaily = schedule.kind === 'daily';
-
-  const setScheduleKind = useCallback(
-    (kind: 'daily' | 'interval') => {
-      if (kind === 'daily' && schedule.kind !== 'daily') {
+  const setFrequencyMode = useCallback(
+    (mode: ScheduleFrequencyMode) => {
+      if (mode === 'interval') {
+        if (schedule.kind === 'interval') {
+          return;
+        }
         dispatch(
           CurrentTaskActions.patchCurrentTask({
-            schedule: {
-              kind: 'daily',
-              hour: schedule.kind === 'interval' ? schedule.hourStart : 9,
-              minute: 0,
-              timezone: schedule.timezone,
-              weekdays: schedule.weekdays,
-            },
+            schedule: buildIntervalScheduleFromPrevious(schedule),
           }),
         );
         return;
       }
-      if (kind === 'interval' && schedule.kind !== 'interval') {
+
+      if (schedule.kind !== 'daily' || getScheduleFrequencyMode(schedule) !== mode) {
         dispatch(
           CurrentTaskActions.patchCurrentTask({
-            schedule: {
-              kind: 'interval',
-              intervalMinutes: 15,
-              timezone: schedule.timezone,
-              weekdays: schedule.weekdays,
-              hourStart: schedule.kind === 'daily' ? schedule.hour : 8,
-              hourEnd: schedule.kind === 'daily' ? schedule.hour + 1 : 17,
-            },
+            schedule: buildDailyScheduleFromMode(mode, schedule),
           }),
         );
       }
@@ -266,15 +277,16 @@ export const TaskDetailEditForm = () => {
             Frequency
             <select
               className={styles.input}
-              value={isDaily ? 'daily' : 'interval'}
-              onChange={(e) => setScheduleKind(e.target.value === 'daily' ? 'daily' : 'interval')}
+              value={frequencyMode}
+              onChange={(e) => setFrequencyMode(e.target.value as ScheduleFrequencyMode)}
             >
-              <option value="daily">Once daily (e.g. morning job)</option>
-              <option value="interval">Repeating interval in a time window</option>
+              <option value="daily">Once per day (on each selected day)</option>
+              <option value="weekly">Once per week</option>
+              <option value="interval">Repeating interval</option>
             </select>
           </label>
           <div className={styles.grid}>
-            {isDaily ? (
+            {!isInterval ? (
               <>
                 <label className={styles.label}>
                   Hour (0–23)
@@ -337,7 +349,7 @@ export const TaskDetailEditForm = () => {
                   />
                 </label>
                 <label className={styles.label}>
-                  Hour start (0–23)
+                  Start hour (0–23)
                   <input
                     className={styles.input}
                     type="number"
@@ -347,25 +359,7 @@ export const TaskDetailEditForm = () => {
                     onChange={(e) =>
                       dispatch(
                         CurrentTaskActions.patchCurrentTask({
-                          schedule: { ...schedule, hourStart: Number(e.target.value) },
-                        }),
-                      )
-                    }
-                    required
-                  />
-                </label>
-                <label className={styles.label}>
-                  Hour end (0–23, exclusive)
-                  <input
-                    className={styles.input}
-                    type="number"
-                    min={0}
-                    max={23}
-                    value={schedule.hourEnd}
-                    onChange={(e) =>
-                      dispatch(
-                        CurrentTaskActions.patchCurrentTask({
-                          schedule: { ...schedule, hourEnd: Number(e.target.value) },
+                          schedule: patchIntervalStartHour(schedule, Number(e.target.value)),
                         }),
                       )
                     }
@@ -391,12 +385,15 @@ export const TaskDetailEditForm = () => {
             </label>
           </div>
           <div className={styles.weekdays}>
-            <span className={styles.weekdaysLabel}>Active days</span>
+            <span className={styles.weekdaysLabel}>
+              {frequencyMode === 'weekly' ? 'Day of week' : 'Active days'}
+            </span>
             <div className={styles.weekdayRow}>
               {WEEKDAY_OPTIONS.map((option) => (
                 <label key={option.value} className={styles.weekdayChip}>
                   <input
-                    type="checkbox"
+                    type={frequencyMode === 'weekly' ? 'radio' : 'checkbox'}
+                    name={frequencyMode === 'weekly' ? 'weekly-day' : undefined}
                     checked={schedule.weekdays.includes(option.value)}
                     onChange={() => toggleWeekday(option.value)}
                     className={styles.checkbox}

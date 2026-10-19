@@ -2,7 +2,9 @@
 
 Dashboard UI for **local-scheduler-express-server**. View scheduled tasks, add tasks, toggle enable flags, run tasks manually, and browse run history.
 
-Default port: **4121**.
+Default port: **3023** (Luckee Hub `webPortStart`); legacy standalone dev may use **4121** if configured in the Next app.
+
+Run **only on the same Mac as the scheduler API** (127.0.0.1). Not required on laptops used only for Gmail web.
 
 ## Quick start
 
@@ -12,9 +14,9 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:4121](http://localhost:4121).
+Open [http://localhost:3023](http://localhost:3023) (or the port shown in the terminal).
 
-Ensure the express server is running on `http://127.0.0.1:4120` with Postgres configured (`DATABASE_URL`).
+Ensure the express server is running on `http://127.0.0.1:3022` with Postgres configured (`DATABASE_URL`).
 
 ## Routes
 

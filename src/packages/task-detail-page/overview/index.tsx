@@ -13,13 +13,17 @@ export const TaskDetailOverview = () => {
   const isRunning = schedulerBuilder.runningTaskIds.includes(task.id);
 
   const workerLabel = useMemo(() => {
-    if (task.expressDir) {
-      return `${task.workerProjectId} · ${task.worker.expressRepoName}`;
+    if (task.schedulerProjectRepo.executionType === 'production') {
+      return task.schedulerProjectRepo.expressRepoName;
     }
-    return `${task.workerProjectId} (no path configured)`;
+    if (task.expressDir) {
+      return `${task.schedulerProjectRepoId} · ${task.worker.expressRepoName}`;
+    }
+    return `${task.schedulerProjectRepoId} (no path configured)`;
   }, [task]);
 
   const statusLabel = isRunning ? 'Running…' : task.lastRunStatus ?? 'Idle';
+  const isProduction = task.schedulerProjectRepo.executionType === 'production';
 
   return (
     <section className={styles.section}>
@@ -28,12 +32,33 @@ export const TaskDetailOverview = () => {
 
       <dl className={styles.grid}>
         <div className={styles.row}>
+          <dt className={styles.label}>Business</dt>
+          <dd className={styles.value}>{task.schedulerProject.name}</dd>
+        </div>
+        <div className={styles.row}>
+          <dt className={styles.label}>Execution target</dt>
+          <dd className={styles.value}>
+            <span className={styles.typeBadge(isProduction)}>
+              {isProduction ? 'Production' : 'Local'}
+            </span>
+            <span className={styles.targetText}>{task.executionTarget || '—'}</span>
+          </dd>
+        </div>
+        <div className={styles.row}>
+          <dt className={styles.label}>Repo</dt>
+          <dd className={styles.valueMono}>{task.schedulerProjectRepoId}</dd>
+        </div>
+        <div className={styles.row}>
           <dt className={styles.label}>Worker</dt>
           <dd className={styles.value}>{workerLabel}</dd>
         </div>
         <div className={styles.row}>
           <dt className={styles.label}>Express path</dt>
           <dd className={styles.valueMono}>{task.expressDir ?? '—'}</dd>
+        </div>
+        <div className={styles.row}>
+          <dt className={styles.label}>Lifecycle</dt>
+          <dd className={styles.valueMono}>{task.lifecycle}</dd>
         </div>
         <div className={styles.row}>
           <dt className={styles.label}>Resolved port</dt>
@@ -78,11 +103,18 @@ const styles = {
     text-xs font-semibold uppercase tracking-wide text-gray-500
   `,
   value: `
-    text-sm text-gray-900
+    text-sm text-gray-900 flex flex-wrap items-center gap-2
+  `,
+  targetText: `
+    text-sm text-gray-800
   `,
   valueMono: `
     text-xs font-mono text-gray-700 break-all
   `,
+  typeBadge: (production: boolean) =>
+    production
+      ? 'inline-flex rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-800'
+      : 'inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700',
   statusBadge: (running: boolean, lastStatus: string | null) => {
     if (running) {
       return 'inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700';

@@ -17,10 +17,30 @@ export type DailyTaskSchedule = {
 
 export type TaskSchedule = IntervalTaskSchedule | DailyTaskSchedule;
 
+export type SchedulerExecutionType = 'local' | 'production';
+
+export type MergedSchedulerProject = {
+  id: string;
+  name: string;
+};
+
+export type MergedSchedulerProjectRepo = {
+  id: string;
+  schedulerProjectId: string;
+  expressRepoName: string;
+  executionType: SchedulerExecutionType;
+  productionBaseUrl: string | null;
+  healthPath: string;
+};
+
 export type ScheduledTask = {
   id: string;
   name: string;
   workerProjectId: string;
+  schedulerProjectRepoId: string;
+  schedulerProject: MergedSchedulerProject;
+  schedulerProjectRepo: MergedSchedulerProjectRepo;
+  executionTarget: string;
   worker: {
     expressRepoName: string;
     defaultPort: number;
@@ -33,7 +53,7 @@ export type ScheduledTask = {
     authEnvKey?: string;
   };
   schedule: TaskSchedule;
-  lifecycle: 'start_if_needed_stop_if_started';
+  lifecycle: 'start_if_needed_stop_if_started' | 'call_only';
   enabled: boolean;
   expressDir: string | null;
   port: number;

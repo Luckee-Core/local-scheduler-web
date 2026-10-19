@@ -28,9 +28,11 @@ const readStoredSidebarVisible = (): boolean => {
 
 type AppLayoutProps = {
   children: ReactNode;
+  /** When true, main content uses full width instead of max-w-6xl. */
+  fullWidth?: boolean;
 };
 
-export const AppLayout = ({ children }: AppLayoutProps) => {
+export const AppLayout = ({ children, fullWidth = false }: AppLayoutProps) => {
   const dispatch = useAppDispatch();
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const pathname = usePathname();
@@ -84,7 +86,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           breadcrumbItems={breadcrumbItems}
         />
         <div className={styles.content}>
-          <div className={styles.inner}>{children}</div>
+          <div className={styles.inner(fullWidth)}>{children}</div>
         </div>
       </div>
     </div>
@@ -101,7 +103,6 @@ const styles = {
   content: `
     flex-1 min-w-0 overflow-y-auto p-4
   `,
-  inner: `
-    w-full max-w-6xl mx-auto
-  `,
+  inner: (fullWidth: boolean) =>
+    fullWidth ? 'w-full' : 'w-full max-w-6xl mx-auto',
 };

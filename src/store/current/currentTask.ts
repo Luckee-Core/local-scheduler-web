@@ -5,6 +5,20 @@ export const EMPTY_SCHEDULED_TASK: ScheduledTask = {
   id: '',
   name: '',
   workerProjectId: '',
+  schedulerProjectRepoId: '',
+  schedulerProject: {
+    id: '',
+    name: '',
+  },
+  schedulerProjectRepo: {
+    id: '',
+    schedulerProjectId: '',
+    expressRepoName: '',
+    executionType: 'local',
+    productionBaseUrl: null,
+    healthPath: '/api/health',
+  },
+  executionTarget: '',
   worker: {
     expressRepoName: '',
     defaultPort: 0,
@@ -43,6 +57,12 @@ export const currentTaskSlice = createSlice({
       return {
         ...state,
         ...patch,
+        schedulerProject: patch.schedulerProject
+          ? { ...state.schedulerProject, ...patch.schedulerProject }
+          : state.schedulerProject,
+        schedulerProjectRepo: patch.schedulerProjectRepo
+          ? { ...state.schedulerProjectRepo, ...patch.schedulerProjectRepo }
+          : state.schedulerProjectRepo,
         worker: patch.worker ? { ...state.worker, ...patch.worker } : state.worker,
         request: patch.request ? { ...state.request, ...patch.request } : state.request,
         schedule: patch.schedule ? { ...state.schedule, ...patch.schedule } : state.schedule,

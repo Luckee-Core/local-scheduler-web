@@ -1,19 +1,35 @@
 'use client';
 
-import { useMemo } from 'react';
-import type { ScheduledTask } from '@/model';
+import { useMemo, useState } from 'react';
 import { useAppSelector } from '@/store';
-import { PtasksTableRow } from './row';
+import { groupTasksByHour, listProjectTabs } from '../group-tasks-for-dashboard';
+import { ALL_PROJECTS_TAB_ID, PtasksProjectTabs } from './project-tabs';
+import { PtasksTaskTimeline } from './task-timeline';
 
 export const PtasksTable = () => {
   const tasks = useAppSelector((state) => state.tasks);
   const runs = useAppSelector((state) => state.runs);
   const schedulerBuilder = useAppSelector((state) => state.schedulerBuilder);
 
-  const sortedTasks = useMemo(
-    () =>
-      Object.values(tasks).sort((a, b) => a.name.localeCompare(b.name)),
-    [tasks],
+  const [selectedProjectId, setSelectedProjectId] = useState(ALL_PROJECTS_TAB_ID);
+
+  const taskList = useMemo(() => Object.values(tasks), [tasks]);
+
+  const projectTabs = useMemo(() => listProjectTabs(taskList), [taskList]);
+
+  const filteredTasks = useMemo(() => {
+    if (selectedProjectId === ALL_PROJECTS_TAB_ID) {
+      return taskList;
+    }
+    return taskList.filter((task) => {
+      const projectId = task.schedulerProject?.id ?? task.schedulerProjectRepoId;
+      return projectId === selectedProjectId;
+    });
+  }, [taskList, selectedProjectId]);
+
+  const buckets = useMemo(
+    () => groupTasksByHour(filteredTasks, selectedProjectId === ALL_PROJECTS_TAB_ID),
+    [filteredTasks, selectedProjectId],
   );
 
   const latestRunByTaskId = useMemo(() => {
@@ -27,11 +43,11 @@ export const PtasksTable = () => {
     return map;
   }, [runs]);
 
-  if (schedulerBuilder.isLoadingTasks && sortedTasks.length === 0) {
+  if (schedulerBuilder.isLoadingTasks && taskList.length === 0) {
     return <p className={styles.empty}>Loading tasks…</p>;
   }
 
-  if (sortedTasks.length === 0) {
+  if (taskList.length === 0) {
     return (
       <p className={styles.empty}>
         No scheduled tasks found. Use <strong>Add task</strong> in the sidebar, run{' '}
@@ -41,59 +57,51 @@ export const PtasksTable = () => {
     );
   }
 
+  const showProjectOnTask = selectedProjectId === ALL_PROJECTS_TAB_ID;
+
   return (
     <div className={styles.wrapper}>
-      <table className={styles.table}>
-        <thead>
-          <tr className={styles.headerRow}>
-            <th className={styles.headerCellTask}>Task</th>
-            <th className={styles.headerCellSchedule}>Schedule</th>
-            <th className={styles.headerCellRuns}>Runs</th>
-            <th className={styles.headerCellActions}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedTasks.map((task: ScheduledTask) => {
-            const latest = latestRunByTaskId.get(task.id);
-            return (
-              <PtasksTableRow
-                key={task.id}
-                task={task}
-                lastRunAt={latest?.finishedAt ?? task.lastRunAt}
-                lastRunStatus={latest?.status ?? task.lastRunStatus}
-              />
-            );
-          })}
-        </tbody>
-      </table>
+      <PtasksProjectTabs
+        projects={projectTabs}
+        selectedProjectId={selectedProjectId}
+        onSelectProjectId={setSelectedProjectId}
+      />
+
+      <div className={styles.columnHeaders} aria-hidden="true">
+        <span>Task</span>
+        <span>How often</span>
+        <span>Active</span>
+        <span className={styles.lastRunHeader}>Last run</span>
+      </div>
+
+      {buckets.length === 0 ? (
+        <p className={styles.emptyFiltered}>No tasks for this project.</p>
+      ) : (
+        <PtasksTaskTimeline
+          buckets={buckets}
+          latestRunByTaskId={latestRunByTaskId}
+          showProjectOnTask={showProjectOnTask}
+        />
+      )}
     </div>
   );
 };
 
 const styles = {
   wrapper: `
-    overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm
+    flex w-full flex-col gap-4
   `,
-  table: `
-    w-full table-fixed border-collapse text-left
+  columnHeaders: `
+    hidden sm:grid sm:grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_5rem_8rem] sm:gap-4 sm:px-1 sm:text-xs sm:font-semibold sm:uppercase sm:tracking-wide sm:text-gray-400
   `,
-  headerRow: `
-    border-b border-gray-200 bg-gray-50
-  `,
-  headerCellTask: `
-    px-3 py-2 w-[38%] text-xs font-semibold uppercase tracking-wide text-gray-500
-  `,
-  headerCellSchedule: `
-    px-3 py-2 w-[32%] text-xs font-semibold uppercase tracking-wide text-gray-500
-  `,
-  headerCellRuns: `
-    px-3 py-2 w-[18%] text-xs font-semibold uppercase tracking-wide text-gray-500
-  `,
-  headerCellActions: `
-    px-3 py-2 w-[12%] text-xs font-semibold uppercase tracking-wide text-gray-500
+  lastRunHeader: `
+    sm:text-right
   `,
   empty: `
     rounded-lg border border-dashed border-gray-300 bg-white px-6 py-12 text-center text-sm text-gray-600
+  `,
+  emptyFiltered: `
+    py-8 text-center text-sm text-gray-500
   `,
   code: `
     rounded bg-gray-100 px-1 py-0.5 font-mono text-xs

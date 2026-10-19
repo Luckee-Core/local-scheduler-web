@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Local Scheduler web needs a tasks dashboard with run history, enable toggles, and manual run actions. UI must follow package composition (dashboard → table → row) and Redux data flow.
+Local Scheduler web needs a tasks dashboard with run history, enable toggles, and manual run actions. UI must follow package composition (dashboard → tabs + task timeline → rows) and Redux data flow.
 
 ## Decision
 
@@ -15,24 +15,23 @@ Local Scheduler web needs a tasks dashboard with run history, enable toggles, an
 | File | Role |
 |------|------|
 | `index.tsx` | Page orchestrator: load tasks + runs on mount |
-| `dashboard/index.tsx` | Toolbar (refresh) + renders table |
-| `table/index.tsx` | Column headers, empty state, maps rows |
-| `table/row/index.tsx` | One task row: enable toggle, run now, status |
+| `dashboard/index.tsx` | Toolbar (refresh) + renders task list |
+| `table/index.tsx` | Project tabs (All + each business), column headers, hour timeline |
+| `table/project-tabs/index.tsx` | Tab bar: All and one tab per `schedulerProject` |
+| `table/task-timeline/index.tsx` | Hour dividers and task rows |
+| `table/task-row/index.tsx` | One row: name, frequency, active/inactive, last run (click → detail) |
+| `group-tasks-for-dashboard.ts` | `listProjectTabs`, `groupTasksByHour` |
+| `format-task-frequency.ts` | Short “how often” copy for rows |
 
 Optional `src/packages/runs/` for full run history page at `/runs`.
 
-### Table columns (v1)
+### Dashboard layout
 
-| Column | Source |
-|--------|--------|
-| Name | `task.name` |
-| Worker / repo | `workerProjectId`, `worker.expressRepoName`, `expressDir` |
-| Endpoint | `METHOD path` |
-| Schedule | `formatTaskSchedule(task.schedule)` in package |
-| Enabled | toggle → `patchTaskEnabledThunk` |
-| Last run | latest run for `taskId` from `dumps/runs` |
-| Next run | `task.nextRunAt` from API |
-| Status | `schedulerBuilder` running state + last run status |
+- Home route uses `AppLayout` with `fullWidth` so the task list spans the main column.
+- **Tabs:** `All` plus one tab per business project (`schedulerProject`).
+- **List:** No per-project panel; filtered tasks only. Ordered by schedule start hour with hour divider rows (e.g. `9 AM`).
+- **Row fields:** task name (full name on All; short name on a project tab), how often (`formatTaskFrequency`), Active/Inactive (`enabled`), last run time.
+- Toggle and run-now stay on `/task-detail-page`. Row click opens detail via `setCurrentTaskThunk`.
 
 ### Redux
 

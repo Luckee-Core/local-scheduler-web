@@ -6,6 +6,7 @@ export type CreateTaskPayload = {
   id: string;
   name: string;
   workerProjectId: string;
+  schedulerProjectRepoId?: string;
   enabled?: boolean;
   worker: ScheduledTask['worker'];
   request: ScheduledTask['request'];
